@@ -14,8 +14,16 @@ import { NavbarComponent } from './shared/navbar/navbar.component';
 import { SidebarComponent } from './shared/sidebar/sidebar.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
+//Formularios reactivos
+import { ReactiveFormsModule } from "@angular/forms";
+
+//Angular Fire
+
 //Bootstrap
 // ng add @ng-bootstrap/ng-bootstrap
+
+//generate environments
+// ng g environments
 
 @NgModule({
   declarations: [
@@ -33,7 +41,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    NgbModule
+    NgbModule,
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
