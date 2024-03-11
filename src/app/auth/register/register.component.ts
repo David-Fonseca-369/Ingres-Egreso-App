@@ -5,6 +5,7 @@ import { FormBuilder } from '@angular/forms';
 import { FormGroup } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-register',
@@ -32,14 +33,28 @@ export class RegisterComponent implements OnInit {
       return;
     }
 
+    Swal.fire({
+      title: 'Espere por favor...',
+      didOpen: ()=> {
+        Swal.showLoading();
+      }
+    })
+
     //Hacemos des-estructuración de objetos y extraemos los campos que requerimos
     const { nombre, correo, password } = this.registroForm.value;
     this.authService
       .createUser(nombre, correo, password)
       .then((credentials) => {
-        console.log(credentials);
+        //Cierro la instancia del loading del Swal
+        Swal.close();
         this.router.navigate(['/']);
       })
-      .catch((error) => console.error(error));
+      .catch((error) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: error.message,
+        });
+      });
   }
 }
