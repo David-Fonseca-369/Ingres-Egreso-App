@@ -5,25 +5,65 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
+  updateProfile,
 } from '@angular/fire/auth';
 import { Firestore } from '@angular/fire/firestore';
-import { map } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { getAuth } from '@angular/fire/auth';
+import Swal from 'sweetalert2';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  constructor(private auth: Auth, private firestore: Firestore) {}
+  constructor(
+    private auth: Auth,
+    private firestore: Firestore,
+    private router: Router
+  ) {}
 
+  //Se encargará de avisarnos cuando suceda algún cambio con la autenticación
   initAuthListener() {
     authState(this.auth).subscribe((fUser) => {
       console.log(fUser);
       console.log(fUser?.uid);
       console.log(fUser?.email);
+      console.log(fUser?.displayName);
     });
   }
-  createUser(nombre: string, email: string, password: string) {
-    return createUserWithEmailAndPassword(this.auth, email, password);
+  createUser(name: string, email: string, password: string) {
+    Swal.fire({
+      title: 'Espere por favor...',
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    return createUserWithEmailAndPassword(this.auth, email, password)
+      .then((userCredentials) => {
+        //Aquí se pueden agregar también la foto de perfil
+        updateProfile(userCredentials.user, { displayName: name })
+          .then(() => {
+            Swal.close();
+            this.router.navigate(['/']);
+          })
+          .catch((error) => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: error.message,
+            });
+          });
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: error.message,
+        });
+      });
+
     //Como es una promesa, se maneja con un then
     // .then(({ user }) => {
     //   console.log(user);

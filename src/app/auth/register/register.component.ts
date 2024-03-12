@@ -35,26 +35,13 @@ export class RegisterComponent implements OnInit {
 
     Swal.fire({
       title: 'Espere por favor...',
-      didOpen: ()=> {
+      didOpen: () => {
         Swal.showLoading();
-      }
-    })
+      },
+    });
 
     //Hacemos des-estructuración de objetos y extraemos los campos que requerimos
     const { nombre, correo, password } = this.registroForm.value;
-    this.authService
-      .createUser(nombre, correo, password)
-      .then((credentials) => {
-        //Cierro la instancia del loading del Swal
-        Swal.close();
-        this.router.navigate(['/']);
-      })
-      .catch((error) => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          text: error.message,
-        });
-      });
+    this.authService.createUser(nombre, correo, password);
   }
 }
