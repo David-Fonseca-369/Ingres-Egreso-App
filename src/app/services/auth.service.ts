@@ -7,11 +7,12 @@ import {
   signOut,
   updateProfile,
 } from '@angular/fire/auth';
-import { Firestore } from '@angular/fire/firestore';
+import { Firestore, addDoc, collection } from '@angular/fire/firestore';
 import { map } from 'rxjs/operators';
 import { getAuth } from '@angular/fire/auth';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
+import { User } from '../models/usuario.model';
 
 @Injectable({
   providedIn: 'root',
@@ -45,8 +46,25 @@ export class AuthService {
         //Aquí se pueden agregar también la foto de perfil
         updateProfile(userCredentials.user, { displayName: name })
           .then(() => {
-            Swal.close();
-            this.router.navigate(['/']);
+            const newUser = new User(
+              userCredentials.user.uid,
+              name,
+              userCredentials.user.email
+            );
+            const userRef = collection(this.firestore, `user`);
+            //Agrego el usuario a la base de datos
+            addDoc(userRef, { ...newUser })
+              .then(() => {
+                Swal.close();
+                this.router.navigate(['/']);
+              })
+              .catch((error) => {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Oops...',
+                  text: error.message,
+                });
+              });
           })
           .catch((error) => {
             Swal.fire({
