@@ -14,6 +14,15 @@ import { NavbarComponent } from './shared/navbar/navbar.component';
 import { SidebarComponent } from './shared/sidebar/sidebar.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
+//NGRX
+//npm install @ngrx/store --save
+import { StoreModule } from "@ngrx/store";
+import { appReducers } from './app.reducer';
+import { StoreDevtoolsModule } from "@ngrx/store-devtools";
+
+//Store Devtools
+// npm install @ngrx/store-devtools --save
+
 //Formularios reactivos
 import { ReactiveFormsModule } from '@angular/forms';
 
@@ -52,6 +61,13 @@ import { environment } from '../environments/environment';
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
     provideAuth(() => getAuth()),
     provideFirestore(() => getFirestore()),
+
+    //Indicarle a la aplicación que estará trabajando con ngrx
+    StoreModule.forRoot(appReducers),
+    StoreDevtoolsModule.instrument({
+      maxAge: 25, //Retains last 25 states
+      logOnly: environment.production //Restrict extension to log-only mode
+    })
   ],
   providers: [],
   bootstrap: [AppComponent],

@@ -4,6 +4,8 @@ import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 
 import Swal from 'sweetalert2';
+import { AppState } from '../../app.reducer';
+import { Store } from '@ngrx/store';
 
 @Component({
   selector: 'app-login',
@@ -12,17 +14,25 @@ import Swal from 'sweetalert2';
 })
 export class LoginComponent implements OnInit {
   loginForm: FormGroup;
+  cargando: boolean = false;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private store: Store<AppState>
   ) {}
 
   ngOnInit(): void {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
+    });
+
+    //Suscripción
+    this.store.select('ui').subscribe((ui) => {
+      this.cargando = ui.isLoading;
+      console.log('Cargando subs');
     });
   }
 
