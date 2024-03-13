@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
@@ -6,15 +6,18 @@ import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { AppState } from '../../app.reducer';
 import { Store } from '@ngrx/store';
+import * as actions from '../../shared/ui.actions';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styles: ``,
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
   loginForm: FormGroup;
-  cargando: boolean = false;
+  isLoading: boolean = false;
+  uiSubscription: Subscription;
 
   constructor(
     private fb: FormBuilder,
@@ -29,11 +32,17 @@ export class LoginComponent implements OnInit {
       password: ['', Validators.required],
     });
 
+    //Aquí puede haber una fuga de memoria, ya que cada que se carga este se suscribe, por lo que hay que destruir la suscripción
     //Suscripción
-    this.store.select('ui').subscribe((ui) => {
-      this.cargando = ui.isLoading;
+    this.uiSubscription = this.store.select('ui').subscribe((ui) => {
+      this.isLoading = ui.isLoading;
       console.log('Cargando subs');
     });
+  }
+
+  ngOnDestroy(): void {
+    //Ejecuta cuando la página es destruida y se encarga de hacer limpiezas
+    this.uiSubscription.unsubscribe()
   }
 
   loginUser() {
@@ -41,22 +50,27 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    Swal.fire({
-      title: 'Espere por favor...',
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
+    //Disparamos el IsLoading
+    this.store.dispatch(actions.isLoading());
+
+    // Swal.fire({
+    //   title: 'Espere por favor...',
+    //   didOpen: () => {
+    //     Swal.showLoading();
+    //   },
+    // });
 
     const { email, password } = this.loginForm.value;
     this.authService
       .loginUser(email, password)
       .then((login) => {
         //Cierro la instancia del loading del Swal
-        Swal.close();
+        // Swal.close();
+        this.store.dispatch(actions.stopLoading());
         this.router.navigate(['/']);
       })
       .catch((error) => {
+        this.store.dispatch(actions.stopLoading());
         Swal.fire({
           icon: 'error',
           title: 'Oops...',
