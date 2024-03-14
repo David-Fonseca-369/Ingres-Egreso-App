@@ -23,6 +23,14 @@ import { User } from '../models/usuario.model';
 })
 export class AuthService {
   userUnsubscribe!: Unsubscribe;
+  //Se deja en privado para que no tengan acceso a esta propiedad
+
+  private _user : User;
+
+  //Para prevenir mutaciones a este user
+  getUser(){
+    return {... this. _user};
+  }
 
   constructor(
     private auth: Auth,
@@ -39,9 +47,11 @@ export class AuthService {
         const q = query(userRef, where("uid", "==", fUser.uid));
         const querySnapshot = (await getDocs(q))
         querySnapshot.forEach((doc: any) => {
+          this._user = doc.data();
           this.store.dispatch(authActions.setUser({user: doc.data()}))
         })
       } else {
+        this._user = null;
         this.userUnsubscribe ? this.userUnsubscribe() : null;
         this.store.dispatch(authActions.unSetUser());
       }

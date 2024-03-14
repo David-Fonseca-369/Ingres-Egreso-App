@@ -72,6 +72,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
               nombre,
               userCredentials.user.email
             );
+
             const userRef = collection(this.firestore, `user`);
             //Agrego el usuario a la base de datos
             addDoc(userRef, { ...newUser })
