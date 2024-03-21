@@ -16,6 +16,6 @@ export class IngresoEgresoService {
       `ingresos-egresos/items/${userId}`
     );
     const docRef = addDoc(collectionReference, { ...ingresoEgreso });
-    console.log('Éxito', docRef);
+    return docRef;
   }
 }

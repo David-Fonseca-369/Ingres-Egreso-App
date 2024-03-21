@@ -55,17 +55,20 @@
             type="submit"
             class="btn btn-success mr-2"
             [disabled]="ingresoForm.invalid"
+            *ngIf="!isLoading"
           >
             <i class="fa fa-save"></i>
             Agregar
           </button>
 
-          <!--
-              <button disabled class="btn btn-success mr-2">
-                <i class="fa fa-spin fa-sync"></i>
-                Espere por favor...
-              </button>
-            -->
+          <button
+            [disabled]="true"
+            class="btn btn-success mr-2"
+            *ngIf="isLoading"
+          >
+            <i class="fa fa-spin fa-sync"></i>
+            Guardando...
+          </button>
 
           <button type="reset" class="btn btn-light">Cancelar</button>
         </form>
