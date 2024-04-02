@@ -4,12 +4,11 @@ import {
   doc,
   collection,
   addDoc,
-  getDocs,
-  where,
   query,
   onSnapshot,
+  deleteDoc,
 } from '@angular/fire/firestore';
-import { IngresoEgreso } from '../models/ingreso-egreso.model';
+import { IngresoEgreso, IngresoEgresoCreate } from '../models/ingreso-egreso.model';
 import { AuthService } from './auth.service';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -27,54 +26,30 @@ export class IngresoEgresoService {
     private store: Store<AppState>
   ) {}
 
-  crearIngresoEgreso(ingresoEgreso: IngresoEgreso) {
-    console.log(ingresoEgreso);
+  crearIngresoEgreso(ingresoEgreso: IngresoEgresoCreate) {
     const userId = this.authService.getUser().uid;
-    const collectionReference = collection(
-      this.firestore,
-      `ingresos-egresos/items/${userId}`
-    );
-    const docRef = addDoc(collectionReference, { ...ingresoEgreso });
-    console.log(docRef);
 
-    return docRef;
+    //Podemos eliminar la propiedad y no se crea la otra clase
+    // delete ingresoEgreso.uid;
+
+    const docRef = doc(this.firestore, `${userId}/ingresos-egresos`);
+    const itemsCollectionRef = collection(docRef, 'items');
+
+    const createRef = addDoc(itemsCollectionRef, { ...ingresoEgreso });
+    return createRef;
   }
 
   async initEgresosEgresosListener(uid: string) {
-    // const userRef = collection(this.firestore, 'ingresos-egresos/items')
-    // const q = query(userRef, where("uid", "==",uid));
-    // const querySnapshot = (await getDocs(q))
-    // querySnapshot.forEach((doc: any) => {
-    //   console.log(doc.data())
-    // })
-    // collection(this.firestore,`${uid}/ingresos-egresos/items`).valueChanges
-
-    const userRef = collection(this.firestore, `ingresos-egresos/items/${uid}`);
+    // const userRef = collection(this.firestore, `ingresos-egresos/items/${uid}`);
+    const userRef = collection(this.firestore, `${uid}/ingresos-egresos/items`);
     const q = query(userRef);
-
-    // // Obtiene los documentos que cumplen con la consulta
-    // getDocs(q).then((querySnapshot) => {
-    //   console.log(querySnapshot.docs);
-    //   const data: IngresoEgreso[] = [];
-    //   querySnapshot.forEach((doc) => {
-    //     // Agrega los datos de cada documento al array
-    //     const { monto, descripcion, tipo } = doc.data();
-    //     data.push({
-    //       // uid: doc.id,
-    //       monto: monto,
-    //       descripcion: descripcion,
-    //       tipo: tipo,
-    //     });
-    //   });
-    //   this.store.dispatch(ingresosEgresosActions.setItems({ items: data }));
-    // });
-
-     // Establece el listener para cambios en la colección
-     onSnapshot(q, (querySnapshot) => {
+    // Establece el listener para cambios en la colección
+    onSnapshot(q, (querySnapshot) => {
       const data: IngresoEgreso[] = [];
       querySnapshot.forEach((doc) => {
         const { monto, descripcion, tipo } = doc.data();
         data.push({
+          uid: doc.id,
           monto: monto,
           descripcion: descripcion,
           tipo: tipo,
@@ -83,5 +58,16 @@ export class IngresoEgresoService {
       // Despacha la acción para actualizar el estado de la aplicación
       this.store.dispatch(ingresosEgresosActions.setItems({ items: data }));
     });
+  }
+
+  borrarIngresoEgreso(uidItem: string) {
+    const userId = this.authService.getUser().uid;
+
+    const docRef = doc(
+      this.firestore,
+      `${userId}/ingresos-egresos/items/${uidItem}`
+    );
+
+    return deleteDoc(docRef);
   }
 }

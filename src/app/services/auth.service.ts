@@ -15,8 +15,17 @@ import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState } from '../app.reducer';
 import * as authActions from '../auth/auth.actions';
-import { Firestore, collection, doc, getDocs, onSnapshot, query, where } from '@angular/fire/firestore';
+import {
+  Firestore,
+  collection,
+  doc,
+  getDocs,
+  onSnapshot,
+  query,
+  where,
+} from '@angular/fire/firestore';
 import { User } from '../models/usuario.model';
+import * as ingresoEgresoActions from '../ingreso-egreso/ingreso-egreso.actions';
 
 @Injectable({
   providedIn: 'root',
@@ -25,11 +34,11 @@ export class AuthService {
   userUnsubscribe!: Unsubscribe;
   //Se deja en privado para que no tengan acceso a esta propiedad
 
-  private _user : User;
+  private _user: User;
 
   //Para prevenir mutaciones a este user
-  getUser(){
-    return {... this. _user};
+  getUser() {
+    return { ...this._user };
   }
 
   constructor(
@@ -41,21 +50,23 @@ export class AuthService {
 
   //Se encargará de avisarnos cuando suceda algún cambio con la autenticación
   initAuthListener() {
-    authState(this.auth).subscribe( async fUser => {
+    authState(this.auth).subscribe(async (fUser) => {
       if (fUser) {
-        const userRef = collection(this.firestore, 'user')
-        const q = query(userRef, where("uid", "==", fUser.uid));
-        const querySnapshot = (await getDocs(q))
+        const userRef = collection(this.firestore, 'user');
+        const q = query(userRef, where('uid', '==', fUser.uid));
+        const querySnapshot = await getDocs(q);
         querySnapshot.forEach((doc: any) => {
           this._user = doc.data();
-          this.store.dispatch(authActions.setUser({user: doc.data()}))
-        })
+          this.store.dispatch(authActions.setUser({ user: doc.data() }));
+        });
       } else {
         this._user = null;
         this.userUnsubscribe ? this.userUnsubscribe() : null;
         this.store.dispatch(authActions.unSetUser());
+        //Limpie items
+        this.store.dispatch(ingresoEgresoActions.unSetItems());
       }
-    })
+    });
   }
   createUser(name: string, email: string, password: string) {
     return createUserWithEmailAndPassword(this.auth, email, password);

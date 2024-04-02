@@ -32,10 +32,17 @@ import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { environment } from '../environments/environment';
+import { OrdenIngresoPipe } from './pipes/orden-ingreso.pipe';
 
 //Bootstrap
 // ng add @ng-bootstrap/ng-bootstrap
 
+//ng add ng2-charts | https://valor-software.com/ng2-charts/
+import { BaseChartDirective } from 'ng2-charts';
+import {
+  provideCharts,
+  withDefaultRegisterables,
+  } from 'ng2-charts';
 //generate environments
 // ng g environments
 
@@ -51,6 +58,7 @@ import { environment } from '../environments/environment';
     FooterComponent,
     NavbarComponent,
     SidebarComponent,
+    OrdenIngresoPipe,
   ],
   imports: [
     BrowserModule,
@@ -67,9 +75,12 @@ import { environment } from '../environments/environment';
     StoreDevtoolsModule.instrument({
       maxAge: 25, //Retains last 25 states
       logOnly: environment.production //Restrict extension to log-only mode
-    })
+    }),
+    BaseChartDirective
   ],
-  providers: [],
+  providers: [
+    provideCharts(withDefaultRegisterables())
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
