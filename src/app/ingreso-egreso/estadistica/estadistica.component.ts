@@ -71,7 +71,6 @@ export class EstadisticaComponent implements OnInit, OnDestroy {
       datasets: [
         {
           data: [this.totalIngresos, this.totalEgresos],
-
         },
       ],
     };
