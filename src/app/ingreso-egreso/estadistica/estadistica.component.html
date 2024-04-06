@@ -79,14 +79,15 @@
       <div class="card-body">
         <h1 class="card-title">Gráfica</h1>
 
-        <div style="display: block;">
-          <canvas
-
-            baseChart
-            [data]="doughnutChartData"
-            [type]="doughnutChartType"
-          >
-          </canvas>
+        <div style="display: flex; justify-content: center;">
+          <div style="display: block; width: 400px; height: 400px">
+            <canvas
+              baseChart
+              [data]="doughnutChartData"
+              [type]="doughnutChartType"
+            >
+            </canvas>
+          </div>
         </div>
       </div>
     </div>

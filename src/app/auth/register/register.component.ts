@@ -12,7 +12,13 @@ import { Subscription } from 'rxjs';
 import * as actions from '../../shared/ui.actions';
 import { Auth, updateProfile } from '@angular/fire/auth';
 import { User } from '../../models/usuario.model';
-import { Firestore, addDoc, collection } from '@angular/fire/firestore';
+import {
+  Firestore,
+  addDoc,
+  collection,
+  doc,
+  setDoc,
+} from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-register',
@@ -73,9 +79,13 @@ export class RegisterComponent implements OnInit, OnDestroy {
               userCredentials.user.email
             );
 
-            const userRef = collection(this.firestore, `user`);
+            // Obtener una referencia al documento que deseas crear
+            const userDocRef = doc(
+              this.firestore,
+              `${userCredentials.user.uid}/users`
+            );
             //Agrego el usuario a la base de datos
-            addDoc(userRef, { ...newUser })
+            setDoc(userDocRef, { ...newUser })
               .then(() => {
                 //Ya que ejecuto el resto de servicios, lo paro
                 this.store.dispatch(actions.stopLoading());

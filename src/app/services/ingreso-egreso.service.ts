@@ -39,7 +39,7 @@ export class IngresoEgresoService {
     return createRef;
   }
 
-  async initEgresosEgresosListener(uid: string) {
+  initEgresosEgresosListener(uid: string) {
     // const userRef = collection(this.firestore, `ingresos-egresos/items/${uid}`);
     const userRef = collection(this.firestore, `${uid}/ingresos-egresos/items`);
     const q = query(userRef);

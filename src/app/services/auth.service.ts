@@ -43,7 +43,6 @@ export class AuthService {
 
   constructor(
     private auth: Auth,
-    private router: Router,
     private store: Store<AppState>,
     private firestore: Firestore
   ) {}
@@ -52,12 +51,32 @@ export class AuthService {
   initAuthListener() {
     authState(this.auth).subscribe(async (fUser) => {
       if (fUser) {
-        const userRef = collection(this.firestore, 'user');
-        const q = query(userRef, where('uid', '==', fUser.uid));
-        const querySnapshot = await getDocs(q);
-        querySnapshot.forEach((doc: any) => {
-          this._user = doc.data();
-          this.store.dispatch(authActions.setUser({ user: doc.data() }));
+        console.log(fUser.uid);
+        // const userRef = collection(this.firestore, 'user');
+        // const q = query(userRef, where('uid', '==', fUser.uid));
+        // const querySnapshot = await getDocs(q);
+        // querySnapshot.forEach((doc: any) => {
+        //   this._user = doc.data();
+        //   this.store.dispatch(authActions.setUser({ user: doc.data() }));
+        // });
+
+        // Suponiendo que `this.firestore` es tu instancia de Firestore y `fUser.uid` es el ID del usuario
+        const docRef = doc(this.firestore, `${fUser.uid}/users`);
+
+        // Establecer el listener para cambios en el documento
+        onSnapshot(docRef, (docSnapshot) => {
+          if (docSnapshot.exists()) {
+            const { uid, nombre, email } = docSnapshot.data();
+            const user: User = {
+              uid,
+              nombre,
+              email,
+            };
+            this.store.dispatch(authActions.setUser({ user: user }));
+          } else {
+            // El documento no existe
+            console.error(`El documento ${fUser.uid} no existe`);
+          }
         });
       } else {
         this._user = null;
