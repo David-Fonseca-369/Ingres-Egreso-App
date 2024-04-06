@@ -28,14 +28,10 @@ export class IngresoEgresoService {
 
   crearIngresoEgreso(ingresoEgreso: IngresoEgresoCreate) {
     const userId = this.authService.getUser().uid;
-
-    //Podemos eliminar la propiedad y no se crea la otra clase
-    // delete ingresoEgreso.uid;
-
     const docRef = doc(this.firestore, `${userId}/ingresos-egresos`);
     const itemsCollectionRef = collection(docRef, 'items');
-
     const createRef = addDoc(itemsCollectionRef, { ...ingresoEgreso });
+
     return createRef;
   }
 

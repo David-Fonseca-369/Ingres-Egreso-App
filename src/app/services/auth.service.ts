@@ -50,17 +50,8 @@ export class AuthService {
   //Se encargará de avisarnos cuando suceda algún cambio con la autenticación
   initAuthListener() {
     authState(this.auth).subscribe(async (fUser) => {
-      if (fUser) {
-        console.log(fUser.uid);
-        // const userRef = collection(this.firestore, 'user');
-        // const q = query(userRef, where('uid', '==', fUser.uid));
-        // const querySnapshot = await getDocs(q);
-        // querySnapshot.forEach((doc: any) => {
-        //   this._user = doc.data();
-        //   this.store.dispatch(authActions.setUser({ user: doc.data() }));
-        // });
 
-        // Suponiendo que `this.firestore` es tu instancia de Firestore y `fUser.uid` es el ID del usuario
+      if (fUser) {
         const docRef = doc(this.firestore, `${fUser.uid}/users`);
 
         // Establecer el listener para cambios en el documento
@@ -72,6 +63,8 @@ export class AuthService {
               nombre,
               email,
             };
+
+            this._user = user;
             this.store.dispatch(authActions.setUser({ user: user }));
           } else {
             // El documento no existe

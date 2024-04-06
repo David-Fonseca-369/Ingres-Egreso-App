@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, filter } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../app.reducer';
 import { isLoading } from '../ui.actions';
@@ -24,9 +24,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.userSubscription.unsubscribe();
   }
   ngOnInit(): void {
-    this.userSubscription = this.store.select('user').subscribe(({ user }) => {
-      this.username = user?.nombre;
-    });
+    this.userSubscription = this.store
+      .select('user')
+      .pipe(filter(({ user }) => user != null)) //para que no procese nulos y no se ocupe esa validación al final (user?.nombre)
+      .subscribe(({ user }) => {
+        this.username = user.nombre;
+      });
   }
   logout() {
     this.authService.logout().then(() => this.router.navigate(['/login']));

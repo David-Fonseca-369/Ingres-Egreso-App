@@ -4,6 +4,7 @@ import { AppState } from '../../app.reducer';
 import { IngresoEgreso } from '../../models/ingreso-egreso.model';
 
 import { ChartData, ChartEvent, ChartType } from 'chart.js';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-estadistica',
@@ -16,18 +17,10 @@ export class EstadisticaComponent implements OnInit, OnDestroy {
 
   totalEgresos: number = 0;
   totalIngresos: number = 0;
+  ingresosEgresosSub: Subscription;
 
   // Doughnut
   public doughnutChartLabels: string[] = ['Ingresos', 'Egresos'];
-  // public doughnutChartData: ChartData<'doughnut'> = {
-  //   labels: this.doughnutChartLabels,
-  //   datasets: {[]
-
-  //     data: [1]
-
-  //   },
-
-  // };
 
   public doughnutChartData: ChartData<'bar'> = {
     labels: this.doughnutChartLabels,
@@ -41,12 +34,14 @@ export class EstadisticaComponent implements OnInit, OnDestroy {
 
   constructor(private store: Store<AppState>) {}
   ngOnDestroy(): void {
-    throw new Error('Method not implemented.');
+    this.ingresosEgresosSub.unsubscribe();
   }
   ngOnInit(): void {
-    this.store.select('ingresosEgresos').subscribe(({ items }) => {
-      this.generarEstadistica(items);
-    });
+    this.ingresosEgresosSub = this.store
+      .select('ingresosEgresos')
+      .subscribe(({ items }) => {
+        this.generarEstadistica(items);
+      });
   }
 
   generarEstadistica(items: IngresoEgreso[]) {
