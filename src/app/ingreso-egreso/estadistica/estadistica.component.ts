@@ -5,6 +5,7 @@ import { IngresoEgreso } from '../../models/ingreso-egreso.model';
 
 import { ChartData, ChartEvent, ChartType } from 'chart.js';
 import { Subscription } from 'rxjs';
+import { AppStateWithIngresoEgreso } from '../ingreso-egreso.reducer';
 
 @Component({
   selector: 'app-estadistica',
@@ -32,7 +33,7 @@ export class EstadisticaComponent implements OnInit, OnDestroy {
   };
   public doughnutChartType: ChartType = 'doughnut';
 
-  constructor(private store: Store<AppState>) {}
+  constructor(private store: Store<AppStateWithIngresoEgreso>) {}
   ngOnDestroy(): void {
     this.ingresosEgresosSub.unsubscribe();
   }

@@ -9,13 +9,17 @@ import { isAuthenticatedGuard } from './services/guards';
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  //Le pasamos las rutas hijas
+  //para cargar module mediante LazyLoad
   {
     path: '',
-    component: DashboardComponent,
-    children: dashboardRoutes,
-    canActivate: [isAuthenticatedGuard],
+    //
+    canLoad: [isAuthenticatedGuard],
+    loadChildren: () =>
+      import('./ingreso-egreso/ingreso-egreso.module').then(
+        (m) => m.IngresoEgresoModule
+      ),
   },
+
   { path: '**', redirectTo: '' },
 ];
 
