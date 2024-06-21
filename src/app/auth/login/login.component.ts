@@ -41,7 +41,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     //Ejecuta cuando la página es destruida y se encarga de hacer limpiezas
-    this.uiSubscription.unsubscribe()
+    this.uiSubscription.unsubscribe();
   }
 
   loginUser() {
